@@ -288,6 +288,7 @@
         <div class="header">
             <h2>📊 Log Aktivitas</h2>
             <form method="POST" action="index.php?url=log/clear" onsubmit="return confirm('Yakin ingin membersihkan semua log?');">
+                <?= Csrf::field() ?>
                 <button type="submit" class="btn-clear">🧹 Bersihkan Semua Log</button>
             </form>
         </div>
@@ -299,8 +300,7 @@
                         <th>#</th>
                         <th>Waktu</th>
                         <th>User</th>
-                        <th>Action</th>
-                        <th>Meta</th>
+                        <th>Aktivitas</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -308,13 +308,13 @@
                     <?php $no=1; while($r = mysqli_fetch_assoc($data)): ?>
                         <tr>
                             <td><?= $no++ ?></td>
-                            <td><?= $r['created_at'] ?? '-' ?></td>
+                            <td><?= htmlspecialchars($r['waktu_aktivitas'] ?? '-') ?></td>
                             <td><?= htmlspecialchars($r['username'] ?? 'System') ?></td>
-                            <td><?= htmlspecialchars($r['action'] ?? '-') ?></td>
-                            <td><?= htmlspecialchars($r['meta'] ?? '-') ?></td>
+                            <td><?= htmlspecialchars($r['aktivitas'] ?? '-') ?></td>
                             <td>
                                 <form method="POST" action="index.php?url=log/delete" style="display:inline;" onsubmit="return confirm('Yakin hapus log ini?');">
-                                    <input type="hidden" name="id" value="<?= $r['id'] ?? '' ?>">
+                                    <?= Csrf::field() ?>
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars($r['id_log'] ?? '') ?>">
                                     <button type="submit" class="btn-delete">Hapus</button>
                                 </form>
                             </td>

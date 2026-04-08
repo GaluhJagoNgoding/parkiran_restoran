@@ -205,7 +205,6 @@
             <nav>
                 <a href="../public/index.php?url=dashboard/index">📊 Dashboard</a>
                 <a href="../public/index.php?url=transaksi/index">💳 Transaksi</a>
-                <a href="../public/index.php?url=kendaraan/index">🚗 Kendaraan</a>
             </nav>
             <div class="role">Role: <strong><?= strtoupper($_SESSION['user']['role'] ?? 'PETUGAS') ?></strong></div>
         </aside>
@@ -220,10 +219,6 @@
                 <div class="card">
                     <h3>📝 Total Transaksi</h3>
                     <div class="num"><?= $transaksi['total'] ?? '0' ?></div>
-                </div>
-                <div class="card">
-                    <h3>🚗 Kendaraan Aktif</h3>
-                    <div class="num"><?= $kendaraan['aktif'] ?? '0' ?></div>
                 </div>
                 <div class="card">
                     <h3>💰 Pendapatan Hari Ini</h3>
@@ -256,11 +251,10 @@
             <div class="section-title">Akses Cepat</div>
             <div class="menu-grid">
                 <a href="../public/index.php?url=transaksi/index" class="menu-item">💳 Manajemen Transaksi</a>
-                <a href="../public/index.php?url=kendaraan/index" class="menu-item">🚗 Data Kendaraan</a>
             </div>
 
             <div class="info-box">
-                <p><strong>📌 Informasi:</strong> Sebagai petugas parkir, Anda dapat mencatat transaksi masuk dan keluar kendaraan, serta melihat data kendaraan yang sedang parkir di restoran.</p>
+                <p><strong>📌 Informasi:</strong> Sebagai petugas parkir, Anda dapat mencatat dan mengelola transaksi parkiran restoran.</p>
             </div>
         </div>
     </div>

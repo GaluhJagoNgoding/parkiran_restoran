@@ -204,6 +204,7 @@
             <nav>
                 <a href="../public/index.php?url=dashboard/index">📊 Dashboard</a>
                 <a href="../public/index.php?url=user/index">👥 Manajemen User</a>
+                <a href="../public/index.php?url=kendaraan/index">🚗 Kendaraan</a>
                 <a href="../public/index.php?url=tarif/index">💰 Tarif Parkir</a>
                 <a href="../public/index.php?url=area/index">📍 Area Parkir</a>
                 <a href="../public/index.php?url=log/index">📊 Log Aktivitas</a>
@@ -235,6 +236,7 @@
             <div class="section-title">Akses Cepat Manajemen</div>
             <div class="menu-grid">
                 <a href="../public/index.php?url=user/index" class="menu-item">👥 Manajemen User</a>
+                <a href="../public/index.php?url=kendaraan/index" class="menu-item">🚗 Data Kendaraan</a>
                 <a href="../public/index.php?url=tarif/index" class="menu-item">💰 Tarif Parkir</a>
                 <a href="../public/index.php?url=area/index" class="menu-item">📍 Area Parkir</a>
                 <a href="../public/index.php?url=log/index" class="menu-item">📊 Log Aktivitas</a>
