@@ -56,6 +56,8 @@ class TransaksiController
      * Menampilkan form untuk mencatat kendaraan masuk parkir.
      * 
      * Fungsi:
+     * - Hanya bisa diakses oleh Admin & Petugas
+     * - Owner TIDAK bisa akses (READ-ONLY)
      * - Mengambil daftar kendaraan terdaftar untuk dropdown
      * - Mengambil daftar area parkir beserta info kapasitas
      * - Menghitung penggunaan area saat ini (real-time)
@@ -66,6 +68,13 @@ class TransaksiController
     public function create()
     {
         Auth::check();
+        
+        // Owner hanya READ-ONLY, tidak bisa create transaksi
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk membuat transaksi. Hanya bisa melihat laporan.');
+            header("Location: index.php?url=transaksi/index");
+            exit;
+        }
 
         // Ambil data kendaraan untuk dropdown
         require_once __DIR__ . '/../models/Kendaraan.php';
@@ -92,6 +101,8 @@ class TransaksiController
      * Menyimpan transaksi parkir baru (kendaraan masuk).
      * 
      * Fungsi:
+     * - Hanya bisa diakses oleh Admin & Petugas
+     * - Owner TIDAK bisa akses (READ-ONLY)
      * 1. Validasi CSRF token
      * 2. Validasi input (kendaraan & area harus dipilih)
      * 3. Cari data kendaraan → ambil jenis_kendaraan
@@ -105,6 +116,14 @@ class TransaksiController
     public function store()
     {
         Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk membuat transaksi.');
+            header("Location: index.php?url=transaksi/index");
+            exit;
+        }
+        
         Csrf::validate();
 
         $id_kendaraan = $_POST['id_kendaraan'] ?? 0;
@@ -183,6 +202,8 @@ class TransaksiController
      * Menampilkan form edit/checkout transaksi.
      * 
      * Fungsi:
+     * - Hanya bisa diakses oleh Admin & Petugas
+     * - Owner TIDAK bisa akses (READ-ONLY)
      * - Mengambil detail transaksi berdasarkan ID
      * - Mengambil info tarif untuk menghitung biaya
      * - Menampilkan form untuk input biaya dan ubah status
@@ -192,6 +213,13 @@ class TransaksiController
     public function edit()
     {
         Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk mengedit transaksi.');
+            header("Location: index.php?url=transaksi/index");
+            exit;
+        }
 
         $id = $_GET['id'] ?? 0;
         $transaksi = Transaksi::find($id);
@@ -213,6 +241,8 @@ class TransaksiController
      * Memproses update transaksi (checkout/pembayaran).
      * 
      * Fungsi:
+     * - Hanya bisa diakses oleh Admin & Petugas
+     * - Owner TIDAK bisa akses (READ-ONLY)
      * 1. Validasi CSRF token
      * 2. Ambil ID, biaya_total, dan status dari form
      * 3. Update transaksi (set waktu_keluar, biaya, status)
@@ -223,6 +253,14 @@ class TransaksiController
     public function update()
     {
         Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk mengupdate transaksi.');
+            header("Location: index.php?url=transaksi/index");
+            exit;
+        }
+        
         Csrf::validate();
 
         $id          = $_POST['id'] ?? 0;
@@ -257,6 +295,8 @@ class TransaksiController
      * Menghapus transaksi parkir.
      * 
      * Fungsi:
+     * - Hanya bisa diakses oleh Admin & Petugas
+     * - Owner TIDAK bisa akses (READ-ONLY)
      * 1. Validasi CSRF token
      * 2. Hapus transaksi berdasarkan ID dari POST
      * 3. Tampilkan pesan sukses/gagal
@@ -266,6 +306,14 @@ class TransaksiController
     public function delete()
     {
         Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk menghapus transaksi.');
+            header("Location: index.php?url=transaksi/index");
+            exit;
+        }
+        
         Csrf::validate();
 
         $id = $_POST['id'] ?? 0;
@@ -285,6 +333,8 @@ class TransaksiController
      * Menampilkan struk/kwitansi transaksi parkir.
      * 
      * Fungsi:
+     * - Hanya bisa diakses oleh Admin & Petugas
+     * - Owner TIDAK bisa akses (READ-ONLY)
      * - Mengambil detail transaksi lengkap
      * - Otomatis mengubah status menjadi 'selesai' saat struk dilihat
      * - Menampilkan halaman struk yang bisa di-print
@@ -294,6 +344,13 @@ class TransaksiController
     public function struk()
     {
         Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk membuka struk.');
+            header("Location: index.php?url=transaksi/index");
+            exit;
+        }
 
         $id = $_GET['id'] ?? 0;
         $transaksi = Transaksi::find($id);
@@ -311,5 +368,76 @@ class TransaksiController
         }
 
         require_once __DIR__ . '/../views/transaksi/struk.php';
+    }
+
+    /**
+     * Menampilkan halaman REKAP TRANSAKSI khusus untuk Owner.
+     * 
+     * Fungsi:
+     * - Hanya bisa diakses oleh Owner (laporan/monitoring)
+     * - Tampilkan ringkasan total pendapatan, transaksi, dll
+     * - Tampilkan grafik/chart penjualan harian
+     * - Export data ke PDF (opsional)
+     * 
+     * @return void
+     */
+    public function rekap()
+    {
+        Auth::check();
+        
+        // Hanya Owner yang bisa akses
+        if ($_SESSION['user']['role'] !== 'owner') {
+            Flash::set('error', 'Hanya Owner yang bisa mengakses laporan rekap.');
+            header("Location: index.php?url=dashboard/index");
+            exit;
+        }
+
+        $db = Database::connect();
+
+        // Filter periode
+        $tgl_dari = $_GET['dari'] ?? date('Y-m-01');  // Awal bulan default
+        $tgl_sampai = $_GET['sampai'] ?? date('Y-m-d');  // Hari ini default
+
+        // ─── STATISTIK TOTAL ────────────────────────────────
+
+        // Total transaksi selesai dalam periode
+        $dari_esc = mysqli_real_escape_string($db, $tgl_dari);
+        $sampai_esc = mysqli_real_escape_string($db, $tgl_sampai);
+        
+        $q_total = mysqli_query($db, "SELECT 
+                                        COUNT(*) total_transaksi,
+                                        SUM(biaya_total) total_pendapatan,
+                                        AVG(biaya_total) rata_pendapatan
+                                      FROM tb_transaksi 
+                                      WHERE status = 'selesai' 
+                                      AND DATE(waktu_keluar) BETWEEN '$dari_esc' AND '$sampai_esc'");
+        $stat = $q_total ? mysqli_fetch_assoc($q_total) : ['total_transaksi' => 0, 'total_pendapatan' => 0, 'rata_pendapatan' => 0];
+
+        // Total transaksi masuk (belum selesai)
+        $q_aktif = mysqli_query($db, "SELECT COUNT(*) aktif FROM tb_transaksi WHERE status='masuk'");
+        $aktif = $q_aktif ? mysqli_fetch_assoc($q_aktif)['aktif'] : 0;
+
+        // Breakdown by jenis kendaraan
+        $q_breakdown = mysqli_query($db, "SELECT 
+                                           k.jenis_kendaraan,
+                                           COUNT(*) jumlah,
+                                           SUM(t.biaya_total) total
+                                         FROM tb_transaksi t
+                                         JOIN tb_kendaraan k ON t.id_kendaraan = k.id_kendaraan
+                                         WHERE t.status = 'selesai'
+                                         AND DATE(t.waktu_keluar) BETWEEN '$dari_esc' AND '$sampai_esc'
+                                         GROUP BY k.jenis_kendaraan
+                                         ORDER BY total DESC");
+
+        // Transaksi terbaru dalam periode
+        $q_recent = mysqli_query($db, "SELECT t.*, k.plat_nomor, k.jenis_kendaraan, a.nama_area
+                                        FROM tb_transaksi t
+                                        JOIN tb_kendaraan k ON t.id_kendaraan = k.id_kendaraan
+                                        LEFT JOIN tb_area a ON t.id_area = a.id_area
+                                        WHERE DATE(t.waktu_keluar) BETWEEN '$dari_esc' AND '$sampai_esc'
+                                        ORDER BY t.waktu_keluar DESC
+                                        LIMIT 20");
+
+        require_once __DIR__ . '/../views/transaksi/rekap.php';
     }
 }

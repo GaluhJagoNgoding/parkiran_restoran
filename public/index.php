@@ -18,19 +18,32 @@
  * - Halaman 404 custom jika tidak ditemukan
  */
 
+// Enable error reporting for debugging (remove in production)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Configure session for hosting compatibility (BEFORE session_start)
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_only_cookies', 1);
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    ini_set('session.cookie_secure', 1);
+}
+
 session_start();
 
-require_once "../app/config/database.php";
+// ─── Parse URL ──────────────────────────────────────────────
+// Extract controller dan method dari parameter URL
+$url = isset($_GET['url']) ? $_GET['url'] : 'auth/index';
+$url = trim($url, '/');
+$parts = explode('/', $url);
 
-// ─── Parsing URL ────────────────────────────────────────────
-// Ambil parameter 'url' dari GET, default ke 'auth/index' (halaman login)
-$url = $_GET['url'] ?? 'auth/index';
-$url = explode('/', $url);
+// Extract controller name (convert to PascalCase + Controller)
+$controller_name = isset($parts[0]) ? $parts[0] : 'auth';
+$controller = ucfirst($controller_name) . 'Controller';
 
-// Bagian pertama = nama controller (huruf pertama kapital + "Controller")
-// Bagian kedua   = nama method (default: 'index')
-$controller = ucfirst($url[0]) . "Controller";
-$method     = $url[1] ?? 'index';
+// Extract method name (default: index)
+$method = isset($parts[1]) ? $parts[1] : 'index';
 
 // ─── Whitelist Controller ───────────────────────────────────
 // Hanya controller dalam daftar ini yang bisa diakses
@@ -60,7 +73,7 @@ if (!in_array($controller, $allowed_controllers)) {
 }
 
 // ─── Load Controller ────────────────────────────────────────
-$controllerFile = "../app/controllers/$controller.php";
+$controllerFile = __DIR__ . "/../app/controllers/$controller.php";
 
 if (!file_exists($controllerFile)) {
     http_response_code(404);

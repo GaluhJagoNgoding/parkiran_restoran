@@ -225,6 +225,7 @@
             <div class="brand">Parkir <strong>Restoran</strong></div>
             <nav>
                 <a href="index.php?url=dashboard/index">📊 Dashboard</a>
+                <a href="index.php?url=transaksi/rekap">📊 Rekap Pendapatan</a>
                 <a href="index.php?url=transaksi/index">📈 Laporan Transaksi</a>
                 <a href="index.php?url=tarif/index">💰 Manajemen Tarif</a>
             </nav>
@@ -290,11 +291,7 @@
                 <?php endif; ?>
             </div>
 
-            <div class="section-title">Akses Cepat</div>
-            <div class="menu-grid">
-                <a href="index.php?url=transaksi/index" class="menu-item">📈 Laporan Transaksi</a>
-                <a href="index.php?url=tarif/index" class="menu-item">💰 Manajemen Tarif</a>
-            </div>
+
 
             <div class="info-box">
                 <p><strong>📌 Selamat Datang, Owner!</strong> Dashboard ini menampilkan ringkasan lengkap bisnis parkir Anda, termasuk total pendapatan, transaksi, dan manajemen tarif. Pantau performa dengan mudah melalui laporan real-time yang tersedia.</p>

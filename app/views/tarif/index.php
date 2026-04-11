@@ -123,7 +123,13 @@
         
         <div class="header">
             <h2>💰 Tarif Parkir</h2>
-            <a href="index.php?url=tarif/create" class="btn-add">+ Tambah Tarif</a>
+            <div>
+                <?php if ($_SESSION['user']['role'] !== 'owner'): ?>
+                    <a href="index.php?url=tarif/create" class="btn-add">+ Tambah Tarif</a>
+                <?php else: ?>
+                    <span style="color: #a1a1a1; font-size: 14px; font-weight: normal;">Mode Laporan (Read-Only)</span>
+                <?php endif; ?>
+            </div>
         </div>
 
         <?php if ($data && mysqli_num_rows($data) > 0): ?>
@@ -145,14 +151,18 @@
                             <td class="price">Rp <?= number_format($tarif['tarif_per_jam'] ?? 0, 0, ',', '.') ?></td>
                             <td class="price">Rp <?= number_format($tarif['tarif_per_hari'] ?? 0, 0, ',', '.') ?></td>
                             <td>
-                                <div class="action-buttons">
-                                    <a href="index.php?url=tarif/edit&id=<?= $tarif['id_tarif'] ?>" class="btn-edit">Edit</a>
-                                    <form method="POST" action="index.php?url=tarif/delete" style="display:inline;" onsubmit="return confirm('Yakin hapus tarif ini?');">
-                                        <?php echo Csrf::field(); ?>
-                                        <input type="hidden" name="id" value="<?= $tarif['id_tarif'] ?>">
-                                        <button type="submit" class="btn-delete">Hapus</button>
-                                    </form>
-                                </div>
+                                <?php if ($_SESSION['user']['role'] !== 'owner'): ?>
+                                    <div class="action-buttons">
+                                        <a href="index.php?url=tarif/edit&id=<?= $tarif['id_tarif'] ?>" class="btn-edit">Edit</a>
+                                        <form method="POST" action="index.php?url=tarif/delete" style="display:inline;" onsubmit="return confirm('Yakin hapus tarif ini?');">
+                                            <?php echo Csrf::field(); ?>
+                                            <input type="hidden" name="id" value="<?= $tarif['id_tarif'] ?>">
+                                            <button type="submit" class="btn-delete">Hapus</button>
+                                        </form>
+                                    </div>
+                                <?php else: ?>
+                                    <span style="color: #999; font-size: 13px;">—</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>

@@ -42,16 +42,31 @@ class TarifController
     /**
      * Menampilkan form tambah tarif baru.
      * 
+     * Hanya Admin yang bisa create tarif.
+     * Owner TIDAK bisa akses (READ-ONLY)
+     * 
      * @return void
      */
     public function create()
     {
-        Auth::adminOrOwner();
+        Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk membuat tarif.');
+            header("Location: index.php?url=tarif/index");
+            exit;
+        }
+        
+        Auth::admin();
         require_once __DIR__ . '/../views/tarif/create.php';
     }
 
     /**
      * Menyimpan tarif baru ke database.
+     * 
+     * Hanya Admin yang bisa simpan.
+     * Owner TIDAK bisa akses (READ-ONLY)
      * 
      * Fungsi:
      * 1. Validasi CSRF token
@@ -64,7 +79,16 @@ class TarifController
      */
     public function store()
     {
-        Auth::adminOrOwner();
+        Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk membuat tarif.');
+            header("Location: index.php?url=tarif/index");
+            exit;
+        }
+        
+        Auth::admin();
         Csrf::validate();
 
         $jenis_kendaraan = trim($_POST['jenis_kendaraan'] ?? '');
@@ -99,6 +123,9 @@ class TarifController
     /**
      * Menampilkan form edit tarif.
      * 
+     * Hanya Admin yang bisa edit tarif.
+     * Owner TIDAK bisa akses (READ-ONLY)
+     * 
      * Fungsi:
      * - Mengambil data tarif berdasarkan ID dari parameter GET
      * - Jika tarif tidak ditemukan, redirect dengan pesan error
@@ -107,7 +134,16 @@ class TarifController
      */
     public function edit()
     {
-        Auth::adminOrOwner();
+        Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk mengedit tarif.');
+            header("Location: index.php?url=tarif/index");
+            exit;
+        }
+        
+        Auth::admin();
 
         $id = $_GET['id'] ?? 0;
         $tarif = Tarif::find($id);
@@ -124,6 +160,9 @@ class TarifController
     /**
      * Memproses update data tarif.
      * 
+     * Hanya Admin yang bisa update tarif.
+     * Owner TIDAK bisa akses (READ-ONLY)
+     * 
      * Fungsi:
      * 1. Validasi CSRF token
      * 2. Validasi input (semua field wajib dan tarif > 0)
@@ -134,7 +173,16 @@ class TarifController
      */
     public function update()
     {
-        Auth::adminOrOwner();
+        Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk mengupdate tarif.');
+            header("Location: index.php?url=tarif/index");
+            exit;
+        }
+        
+        Auth::admin();
         Csrf::validate();
 
         $id              = $_POST['id'] ?? 0;
@@ -171,6 +219,9 @@ class TarifController
     /**
      * Menghapus tarif dari database.
      * 
+     * Hanya Admin yang bisa delete tarif.
+     * Owner TIDAK bisa akses (READ-ONLY)
+     * 
      * Fungsi:
      * 1. Validasi CSRF token
      * 2. Validasi ID tarif
@@ -181,7 +232,16 @@ class TarifController
      */
     public function delete()
     {
-        Auth::adminOrOwner();
+        Auth::check();
+        
+        // Owner hanya READ-ONLY
+        if ($_SESSION['user']['role'] === 'owner') {
+            Flash::set('error', 'Owner tidak memiliki akses untuk menghapus tarif.');
+            header("Location: index.php?url=tarif/index");
+            exit;
+        }
+        
+        Auth::admin();
         Csrf::validate();
 
         $id = $_POST['id'] ?? 0;

@@ -30,7 +30,11 @@
         <div class="header">
             <h2>📋 Daftar Transaksi</h2>
             <div>
-                <a class="button" href="index.php?url=transaksi/create">+ Tambah Transaksi</a>
+                <?php if ($_SESSION['user']['role'] !== 'owner'): ?>
+                    <a class="button" href="index.php?url=transaksi/create">+ Tambah Transaksi</a>
+                <?php else: ?>
+                    <span style="color: #666; font-size: 12px; font-style: italic;">Owner - Mode Laporan (Read-Only)</span>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -72,12 +76,14 @@
                             <td>
                                 <div class="actions">
                                     <a class="button" href="index.php?url=transaksi/struk&id=<?= $row['id_parkir'] ?>">Struk</a>
-                                    <a class="button" href="index.php?url=transaksi/edit&id=<?= $row['id_parkir'] ?>">Edit</a>
-                                    <form method="POST" action="index.php?url=transaksi/delete" style="display:inline;">
-                                        <?php echo Csrf::field(); ?>
-                                        <input type="hidden" name="id" value="<?= $row['id_parkir'] ?>">
-                                        <button class="button btn-danger" onclick="return confirm('Yakin hapus transaksi?')">Hapus</button>
-                                    </form>
+                                    <?php if ($_SESSION['user']['role'] !== 'owner'): ?>
+                                        <a class="button" href="index.php?url=transaksi/edit&id=<?= $row['id_parkir'] ?>">Edit</a>
+                                        <form method="POST" action="index.php?url=transaksi/delete" style="display:inline;">
+                                            <?php echo Csrf::field(); ?>
+                                            <input type="hidden" name="id" value="<?= $row['id_parkir'] ?>">
+                                            <button class="button btn-danger" onclick="return confirm('Yakin hapus transaksi?')">Hapus</button>
+                                        </form>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>
